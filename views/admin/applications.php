@@ -1,0 +1,19 @@
+<?php
+use app\helpers\Ui;
+use yii\helpers\{Html, ArrayHelper};
+$this->title = 'ใบสมัครทั้งหมด';
+?>
+<div class="page-heading"><div><p class="eyebrow">งานรับสมัคร <span class="heading-divider">/</span> ตรวจสอบข้อมูลและการชำระเงิน</p><h1>ใบสมัครทั้งหมด</h1></div><?= Ui::link('จัดการรอบสอบ', ['index'], 'calendar-range') ?></div>
+<div class="application-status-bar"><a href="<?= \yii\helpers\Url::to(['applications']) ?>" class="<?= !$status ? 'is-selected' : '' ?>">ทั้งหมด <strong><?= array_sum(array_column($statusCounts, 'count')) ?></strong></a><a href="<?= \yii\helpers\Url::to(['applications', 'status' => 'payment_review']) ?>" class="<?= $status === 'payment_review' ? 'is-selected' : '' ?>"><?= Ui::icon('file-check-2') ?>รอตรวจสอบชำระเงิน <strong><?= (int) ($statusCounts['payment_review']['count'] ?? 0) ?></strong></a><a href="<?= \yii\helpers\Url::to(['applications', 'status' => 'incomplete']) ?>" class="<?= $status === 'incomplete' ? 'is-selected' : '' ?>">ใบสมัครเดิมไม่สมบูรณ์ <strong><?= (int) ($statusCounts['incomplete']['count'] ?? 0) ?></strong></a></div>
+<?= Html::beginForm(['applications'], 'get', ['class' => 'application-filters']) ?>
+<div class="field"><label for="application-search">ชื่อผู้สมัคร / เลขที่ใบสมัคร</label><div class="search-field"><?= Ui::icon('search') ?><?= Html::input('search', 'q', $q, ['id' => 'application-search', 'placeholder' => 'ค้นหาผู้สมัคร...', 'maxlength' => 190]) ?></div></div>
+<div class="field"><label for="application-round">รอบสอบ</label><?= Html::dropDownList('round', $roundId, ArrayHelper::map($rounds, 'id', 'name'), ['id' => 'application-round', 'class' => 'input', 'prompt' => 'ทุกรอบสอบ']) ?></div>
+<div class="field"><label for="application-status">สถานะ</label><?= Html::dropDownList('status', $status, Ui::APPLICATION_STATUSES, ['id' => 'application-status', 'class' => 'input', 'prompt' => 'ทุกสถานะ']) ?></div>
+<div class="filter-actions"><button type="submit" class="button-primary"><?= Ui::icon('search') ?>ค้นหา</button><?= Ui::link('ล้างตัวกรอง', ['applications'], 'rotate-ccw', 'button-quiet') ?></div>
+<?= Html::endForm() ?>
+<div class="section-bar"><h2>รายการใบสมัคร <span class="count-label"><?= $provider->totalCount ?></span></h2><span class="text-sm text-muted">เรียงจากใบสมัครล่าสุด</span></div>
+<div class="table-scroll responsive-table-wrap"><table class="data-table applications-table responsive-table"><thead><tr><th>ผู้สมัคร / เลขที่ใบสมัคร</th><th>รอบสอบ</th><th class="text-right">ค่าสมัคร</th><th>สถานะ</th><th><span class="sr-only">ตรวจสอบ</span></th></tr></thead><tbody>
+<?php foreach ($provider->getModels() as $application): ?><tr><td class="applicant-name-cell"><strong><?= Html::encode($application->applicant->name) ?></strong><small class="cell-secondary"><?= Html::encode($application->reference) ?></small><small class="cell-secondary"><?= Ui::date($application->created_at) ?></small></td><td data-label="รอบสอบ"><?= Html::encode($application->round->name) ?><small class="cell-secondary"><?= count($application->items) ?> วิชา</small></td><td data-label="ค่าสมัคร" class="text-right tabular-nums font-semibold"><?= Ui::money($application->total) ?><small class="cell-secondary">บาท</small></td><td data-label="สถานะ"><?= Ui::status($application->status) ?></td><td class="row-action"><?= Ui::link('ตรวจใบสมัคร', ['/applicant/view', 'id' => $application->id], 'arrow-right', 'button-secondary') ?></td></tr><?php endforeach ?>
+<?php if (!$provider->totalCount): ?><tr><td colspan="5" class="empty-state"><?= Ui::icon('files') ?><p><?= $q || $status || $roundId ? 'ไม่พบใบสมัครตามตัวกรอง' : 'ยังไม่มีใบสมัคร' ?></p><?php if ($q || $status || $roundId): ?><?= Ui::link('ดูใบสมัครทั้งหมด', ['applications'], 'rotate-ccw', 'button-quiet') ?><?php endif ?></td></tr><?php endif ?>
+</tbody></table></div>
+<div class="pagination"><?= \yii\widgets\LinkPager::widget(['pagination' => $provider->pagination]) ?></div>

@@ -1,0 +1,15 @@
+<?php
+use app\helpers\Ui;
+use app\models\ApplicationResult;
+use yii\helpers\Html;
+$this->title = 'ผลคัดเลือกและประกาศผล';
+$editable = Yii::$app->user->identity->can('results.manage') && !$round?->results_published_at;
+?>
+<div class="page-heading"><div><p class="eyebrow">5 · ประกาศผลสอบ</p><h1><?= $this->title ?></h1></div><?= Ui::link('คะแนนรายวิชา / เข้าสอบ', ['scores', 'round' => $round?->id], 'book-open') ?></div>
+<?= $this->render('_round-picker', compact('round', 'rounds')) ?>
+<?php if ($round): ?><div class="section-bar"><h2><?= $round->results_published_at ? 'ประกาศผลแล้ว' : 'ผลสอบแบบร่าง' ?></h2><?php if ($round->results_published_at): ?><time class="text-sm"><?= Ui::date($round->results_published_at) ?></time><?php endif ?></div>
+<?= Html::beginForm(['save-outcomes', 'round' => $round->id], 'post') ?><?= Html::hiddenInput('revision', \app\services\ResultService::revision($round->id)) ?><div class="table-scroll"><table class="data-table"><thead><tr><th>เลขสอบ / ผู้สมัคร</th><th>คะแนนรวม</th><th>ผลคัดเลือก</th><th>หมายเหตุ</th></tr></thead><tbody>
+<?php foreach ($provider->getModels() as $app): $total = 0; $max = 0; $complete = true; foreach ($app->items as $item) { $total += (float) ($item->score?->score ?? 0); $max += (float) $item->subject->max_score; if (!$item->score || $item->score->attendance === 'pending') $complete = false; } ?>
+<tr><td><?= Html::encode($app->ticket?->exam_number ?? $app->reference) ?><small class="cell-secondary"><?= Html::encode($app->profile?->data['applicant_name'] ?? $app->applicant->name) ?></small></td><td><?= $complete ? number_format($total, 2) . ' / ' . number_format($max, 2) : 'ยังบันทึกไม่ครบ' ?></td><td><?= Html::dropDownList('Outcomes[' . $app->id . '][outcome]', $app->result?->outcome, ApplicationResult::OUTCOMES, ['prompt' => 'ยังไม่ตัดสินผล', 'class' => 'input', 'disabled' => !$editable, 'aria-label' => 'ผลคัดเลือก ' . $app->reference]) ?></td><td><?= Html::textInput('Outcomes[' . $app->id . '][note]', $app->result?->note, ['class' => 'input', 'maxlength' => 2000, 'disabled' => !$editable, 'aria-label' => 'หมายเหตุ ' . $app->reference]) ?></td></tr><?php endforeach ?>
+<?php if (!$provider->totalCount): ?><tr><td colspan="4" class="empty-state">ยังไม่มีผู้มีสิทธิ์สอบ</td></tr><?php endif ?></tbody></table></div><?php if ($editable && $provider->totalCount): ?><div class="form-footer"><button type="submit" class="button-primary">บันทึกผลคัดเลือกหน้านี้</button></div><?php endif ?><?= Html::endForm() ?><div class="pagination"><?= \yii\widgets\LinkPager::widget(['pagination' => $provider->pagination]) ?></div>
+<?php if (Yii::$app->user->identity->can('results.publish')): ?><?= Html::beginForm(['publish-results', 'round' => $round->id], 'post', ['class' => 'operations-actions']) ?><?= Html::hiddenInput('publish', $round->results_published_at ? '0' : '1') ?><?= Html::hiddenInput('revision', \app\services\ResultService::revision($round->id)) ?><button type="submit" class="button-primary"><?= Ui::icon('file-check-2') ?><?= $round->results_published_at ? 'ถอนประกาศผลเพื่อแก้ไข' : 'เปิดประกาศผลให้ผู้สมัคร' ?></button><?= Html::endForm() ?><?php endif ?><?php endif ?>

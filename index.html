@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mockup ระบบจัดสอบและรับสมัครออนไลน์</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="เมนูหลัก">
+        <div class="brand">
+          <div class="brand-mark">ส</div>
+          <div>
+            <strong>ExamOps</strong>
+            <span>ระบบจัดสอบ</span>
+          </div>
+        </div>
+
+        <nav class="main-nav">
+          <a class="active" href="#setup">ตั้งค่าการสอบ</a>
+          <a href="#applications">ใบสมัคร</a>
+          <a href="#payments">การเงิน</a>
+          <a href="#exam-page">หน้าสอบ</a>
+          <a href="#venues">สนามสอบ</a>
+          <a href="#results">ผลสอบ</a>
+          <a href="#reports">รายงาน</a>
+        </nav>
+
+        <div class="sidebar-note">
+          <span class="dot green"></span>
+          รอบสอบเปิดรับสมัครอยู่ 2 รอบ
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Admin setup</p>
+            <h1>ตั้งค่าประเภทการสอบ รอบสอบ รายวิชา ค่าสมัคร เอกสาร และช่วงเวลารับสมัคร</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost" type="button">ดูตัวอย่างหน้าผู้สมัคร</button>
+            <button class="primary" type="button">บันทึกและเปิดรับสมัคร</button>
+          </div>
+        </header>
+
+        <section class="process-strip" aria-label="ขั้นตอนตั้งค่าระบบ">
+          <button class="step done" type="button"><span>1</span>ประเภทสอบ</button>
+          <button class="step active" type="button"><span>2</span>รอบสอบ</button>
+          <button class="step" type="button"><span>3</span>รายวิชา</button>
+          <button class="step" type="button"><span>4</span>ค่าสมัคร</button>
+          <button class="step" type="button"><span>5</span>เอกสาร</button>
+          <button class="step" type="button"><span>6</span>ช่วงเวลา</button>
+        </section>
+
+        <section class="summary-band" aria-label="สรุปสถานะ">
+          <div>
+            <span class="metric-label">ประเภทสอบ</span>
+            <strong>สอบคัดเลือกบุคคล</strong>
+          </div>
+          <div>
+            <span class="metric-label">รอบสอบ</span>
+            <strong>3 รอบ</strong>
+          </div>
+          <div>
+            <span class="metric-label">รายวิชา</span>
+            <strong>8 วิชา</strong>
+          </div>
+          <div>
+            <span class="metric-label">ค่าสมัครรวมสูงสุด</span>
+            <strong>1,250 บาท</strong>
+          </div>
+        </section>
+
+        <div class="content-grid">
+          <section class="setup-panel" id="setup">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Exam round</p>
+                <h2>ข้อมูลรอบสอบ</h2>
+              </div>
+              <span class="status-pill">กำลังตั้งค่า</span>
+            </div>
+
+            <form class="form-grid">
+              <label>
+                ประเภทการสอบ
+                <select>
+                  <option>สอบคัดเลือกบุคคลเข้าศึกษา</option>
+                  <option>สอบวัดสมรรถนะ</option>
+                  <option>สอบเลื่อนระดับ</option>
+                </select>
+              </label>
+              <label>
+                ชื่อรอบสอบ
+                <input value="รอบที่ 1 ภาคเช้า" />
+              </label>
+              <label>
+                เปิดรับสมัคร
+                <input type="date" value="2026-09-10" />
+              </label>
+              <label>
+                ปิดรับสมัคร
+                <input type="date" value="2026-09-30" />
+              </label>
+              <label class="wide">
+                คำอธิบายรอบสอบ
+                <textarea>เปิดรับสมัครสำหรับผู้สมัครทั่วไป เลือกสอบได้หลายรายวิชา ระบบจะคิดค่าสมัครตามรายวิชาที่เลือก</textarea>
+              </label>
+            </form>
+
+            <div class="subsection-title">
+              <h3>กำหนดการของรอบสอบ</h3>
+              <button class="small-button" type="button">เพิ่มช่วงเวลา</button>
+            </div>
+
+            <div class="schedule-board" aria-label="กำหนดการของรอบสอบ">
+              <div class="schedule-item complete">
+                <span class="schedule-date">10 ก.ย.</span>
+                <div>
+                  <strong>เปิดรับสมัคร</strong>
+                  <small>08:30 น. เปิดหน้าสมัครและเลือกวิชา</small>
+                </div>
+              </div>
+              <div class="schedule-item active">
+                <span class="schedule-date">30 ก.ย.</span>
+                <div>
+                  <strong>ปิดรับสมัคร</strong>
+                  <small>16:30 น. ล็อกข้อมูลใบสมัคร</small>
+                </div>
+              </div>
+              <div class="schedule-item">
+                <span class="schedule-date">2 ต.ค.</span>
+                <div>
+                  <strong>สิ้นสุดชำระเงิน</strong>
+                  <small>ระบบตรวจยอดแยกรายวิชา</small>
+                </div>
+              </div>
+              <div class="schedule-item">
+                <span class="schedule-date">5 ต.ค.</span>
+                <div>
+                  <strong>ประกาศรายชื่อผู้มีสิทธิ์สอบ</strong>
+                  <small>เปิดดาวน์โหลดบัตรสอบหลังจัดห้องครบ</small>
+                </div>
+              </div>
+              <div class="schedule-item exam">
+                <span class="schedule-date">12-13 ต.ค.</span>
+                <div>
+                  <strong>วันสอบ</strong>
+                  <small>แยกเวลาและห้องสอบตามรายวิชา</small>
+                </div>
+              </div>
+              <div class="schedule-item">
+                <span class="schedule-date">20 ต.ค.</span>
+                <div>
+                  <strong>ประกาศผลสอบ</strong>
+                  <small>แสดงผลรายบุคคลและรายวิชา</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection-title">
+              <h3>รายวิชาในรอบสอบนี้</h3>
+              <button class="small-button" id="showSubjectForm" type="button">เพิ่มวิชา</button>
+            </div>
+
+            <form class="subject-form" id="subjectForm" aria-label="สร้างรายวิชา">
+              <label>
+                รหัสวิชา
+                <input id="subjectCode" value="IT501" />
+              </label>
+              <label>
+                ชื่อวิชา
+                <input id="subjectName" value="ความถนัดด้านเทคโนโลยี" />
+              </label>
+              <label>
+                วันสอบ
+                <input id="subjectDate" type="date" value="2026-10-13" />
+              </label>
+              <label>
+                เวลา
+                <input id="subjectTime" value="13:30-15:00" />
+              </label>
+              <label>
+                จำนวนที่นั่ง
+                <input id="subjectSeats" type="number" value="120" />
+              </label>
+              <label>
+                ค่าสมัคร
+                <input id="subjectFee" type="number" value="400" />
+              </label>
+              <div class="form-actions">
+                <button class="ghost" id="cancelSubject" type="button">ยกเลิก</button>
+                <button class="primary" type="submit">สร้างวิชา</button>
+              </div>
+            </form>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>รหัส</th>
+                    <th>รายวิชา</th>
+                    <th>วันเวลา</th>
+                    <th>ที่นั่ง</th>
+                    <th>ค่าสมัคร</th>
+                    <th>สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody id="subjectRows">
+                  <tr>
+                    <td>TH101</td>
+                    <td>ภาษาไทย</td>
+                    <td>12 ต.ค. 09:00-10:30</td>
+                    <td>240</td>
+                    <td>250 บาท</td>
+                    <td><span class="tag open">เปิด</span></td>
+                  </tr>
+                  <tr>
+                    <td>EN201</td>
+                    <td>ภาษาอังกฤษ</td>
+                    <td>12 ต.ค. 11:00-12:30</td>
+                    <td>240</td>
+                    <td>300 บาท</td>
+                    <td><span class="tag open">เปิด</span></td>
+                  </tr>
+                  <tr>
+                    <td>MT301</td>
+                    <td>คณิตศาสตร์</td>
+                    <td>12 ต.ค. 13:30-15:00</td>
+                    <td>180</td>
+                    <td>350 บาท</td>
+                    <td><span class="tag review">ตรวจเวลา</span></td>
+                  </tr>
+                  <tr>
+                    <td>SC401</td>
+                    <td>วิทยาศาสตร์</td>
+                    <td>13 ต.ค. 09:00-10:30</td>
+                    <td>180</td>
+                    <td>350 บาท</td>
+                    <td><span class="tag draft">ร่าง</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="inspector" aria-label="รายละเอียดด้านข้าง">
+            <div class="inspector-block">
+              <h2>คำนวณค่าสมัคร</h2>
+              <label class="check-row">
+                <input type="checkbox" checked />
+                ภาษาไทย 250 บาท
+              </label>
+              <label class="check-row">
+                <input type="checkbox" checked />
+                ภาษาอังกฤษ 300 บาท
+              </label>
+              <label class="check-row">
+                <input type="checkbox" checked />
+                คณิตศาสตร์ 350 บาท
+              </label>
+              <label class="check-row">
+                <input type="checkbox" />
+                วิทยาศาสตร์ 350 บาท
+              </label>
+              <div class="total-row">
+                <span>ยอดที่ผู้สมัครต้องชำระ</span>
+                <strong>900 บาท</strong>
+              </div>
+            </div>
+
+            <div class="inspector-block">
+              <h2>เอกสารที่ต้องใช้</h2>
+              <div class="doc-item">
+                <span>รูปถ่าย</span>
+                <small>JPG/PNG ไม่เกิน 2 MB</small>
+              </div>
+              <div class="doc-item">
+                <span>บัตรประชาชน</span>
+                <small>PDF/JPG ไม่เกิน 5 MB</small>
+              </div>
+              <div class="doc-item">
+                <span>วุฒิการศึกษา</span>
+                <small>จำเป็นทุกประเภทผู้สมัคร</small>
+              </div>
+            </div>
+
+            <div class="inspector-block">
+              <h2>ตรวจความพร้อม</h2>
+              <ul class="readiness-list">
+                <li><span class="dot green"></span>ตั้งค่ารายวิชาครบ</li>
+                <li><span class="dot green"></span>กำหนดค่าสมัครแล้ว</li>
+                <li><span class="dot amber"></span>คณิตศาสตร์รอตรวจเวลาสอบ</li>
+                <li><span class="dot red"></span>ยังไม่ได้ผูกสนามสอบ</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+
+        <section class="exam-page" id="exam-page" aria-label="หน้าสอบ">
+          <div class="exam-hero">
+            <div>
+              <p class="eyebrow">Exam day</p>
+              <h2>หน้าสอบรอบที่ 1</h2>
+              <p>ภาพรวมที่เจ้าหน้าที่ใช้ตรวจความพร้อมก่อนเปิดบัตรสอบและติดตามสถานะวันสอบแบบรายวิชา</p>
+            </div>
+            <div class="exam-stamp">
+              <span>พร้อมใช้งาน</span>
+              <strong>86%</strong>
+            </div>
+          </div>
+
+          <div class="exam-layout">
+            <section class="exam-card featured-subject">
+              <div class="subject-topline">
+                <span class="tag open">เปิดรับสมัคร</span>
+                <span>12 ต.ค. 2569</span>
+              </div>
+              <h3>ภาษาไทย</h3>
+              <div class="exam-meta">
+                <span>09:00-10:30</span>
+                <span>อาคาร A ห้อง 301-304</span>
+                <span>240 ที่นั่ง</span>
+              </div>
+              <div class="seat-meter" aria-label="จำนวนที่นั่งที่ใช้แล้ว">
+                <span style="width: 72%"></span>
+              </div>
+              <div class="subject-footer">
+                <span>สมัครแล้ว 173 คน</span>
+                <strong>250 บาท</strong>
+              </div>
+            </section>
+
+            <section class="exam-card subject-stack">
+              <h3>รายวิชาวันสอบ</h3>
+              <article>
+                <span class="time">11:00</span>
+                <div>
+                  <strong>ภาษาอังกฤษ</strong>
+                  <small>อาคาร A ห้อง 305-308 · 240 ที่นั่ง</small>
+                </div>
+                <b>300</b>
+              </article>
+              <article>
+                <span class="time">13:30</span>
+                <div>
+                  <strong>คณิตศาสตร์</strong>
+                  <small>อาคาร B ห้อง 201-203 · รอตรวจเวลา</small>
+                </div>
+                <b>350</b>
+              </article>
+              <article>
+                <span class="time">09:00</span>
+                <div>
+                  <strong>วิทยาศาสตร์</strong>
+                  <small>13 ต.ค. · อาคาร C ห้อง 101-103</small>
+                </div>
+                <b>350</b>
+              </article>
+            </section>
+
+            <section class="exam-card readiness-panel">
+              <h3>ความพร้อมก่อนสอบ</h3>
+              <div class="readiness-score">
+                <strong>4/5</strong>
+                <span>งานหลักพร้อมแล้ว</span>
+              </div>
+              <ul class="readiness-list">
+                <li><span class="dot green"></span>รายวิชาและค่าสมัครครบ</li>
+                <li><span class="dot green"></span>เอกสารสมัครกำหนดแล้ว</li>
+                <li><span class="dot green"></span>กำหนดการประกาศผลพร้อม</li>
+                <li><span class="dot amber"></span>รอยืนยันห้องสอบบางวิชา</li>
+              </ul>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

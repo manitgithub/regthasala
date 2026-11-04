@@ -1,0 +1,3 @@
+TEST DATA ONLY - NOT A PAYMENT RECEIPT
+DEMO-R5-003
+No actual bank transfer occurred.

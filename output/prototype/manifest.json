@@ -1,0 +1,86 @@
+[
+  {
+    "name": "01-admissions",
+    "title": "เลือกรอบรับสมัคร",
+    "subtitle": "การ์ดแยก ม.1 และ ม.4 พร้อมโครงการ จำนวนรับ ค่าสมัคร และช่วงรับสมัคร",
+    "image": "screenshots/01-admissions.png",
+    "url": "/site/index"
+  },
+  {
+    "name": "02-programs",
+    "title": "เลือกระดับชั้นและโครงการ",
+    "subtitle": "เลือกโครงการด้วยการ์ด Radio พร้อมเกณฑ์คุณสมบัติและค่าสมัคร",
+    "image": "screenshots/02-programs.png",
+    "url": "/applicant/apply?id=4"
+  },
+  {
+    "name": "03-education",
+    "title": "แบบฟอร์มสมัครออนไลน์",
+    "subtitle": "ข้อมูลโรงเรียนเดิม ผลการเรียน และผู้ปกครอง อยู่ในใบสมัครเดียวกัน",
+    "image": "screenshots/03-education.png",
+    "url": "/applicant/apply?id=4"
+  },
+  {
+    "name": "04-payment",
+    "title": "ตั้งค่าบัญชีรับเงินรายรอบ",
+    "subtitle": "โรงเรียนกำหนดธนาคาร เลขบัญชี ชื่อบัญชี และข้อความแจ้งผู้สมัครได้เอง • ยังไม่มีบัญชีจริงในภาพ",
+    "image": "screenshots/04-payment.png",
+    "url": "/admin/edit?entity=round&id=4"
+  },
+  {
+    "name": "05-status",
+    "title": "ตรวจสอบสถานะและพิมพ์บัตร",
+    "subtitle": "ยืนยันตัวตนด้วยเลขบัตรประชาชนและวันเกิด 8 หลัก พ.ศ. โดยไม่ต้องสมัครสมาชิกแยก",
+    "image": "screenshots/05-status.png",
+    "url": "/site/status"
+  },
+  {
+    "name": "06-admin",
+    "title": "ภาพรวมสำหรับเจ้าหน้าที่",
+    "subtitle": "ค้นหารอบ แยกสถานะ และเข้าสู่งานรับสมัครจากหน้าหลัก",
+    "image": "screenshots/06-admin.png",
+    "url": "/admin/index"
+  },
+  {
+    "name": "07-applications",
+    "title": "รายการใบสมัคร",
+    "subtitle": "ติดตามผู้สมัคร โครงการ และสถานะ พร้อมเปิดรายละเอียดเพื่อพิจารณา",
+    "image": "screenshots/07-applications.png",
+    "url": "/admin/applications?round=5"
+  },
+  {
+    "name": "08-review",
+    "title": "ตรวจคุณสมบัติและชำระเงิน",
+    "subtitle": "แยกผลพิจารณาคุณสมบัติออกจากผลตรวจรับชำระเงิน พร้อมเหตุผลประกอบ",
+    "image": "screenshots/08-review.png",
+    "url": "/applicant/view?id=78"
+  },
+  {
+    "name": "09-exam-operations",
+    "title": "จัดสอบและรันเลขอัตโนมัติ",
+    "subtitle": "ตั้งรูปแบบเลขประจำตัวสอบ ห้อง และความจุ แยกตามรอบสอบ",
+    "image": "screenshots/09-exam-operations.png",
+    "url": "/operations/rooms?round=5"
+  },
+  {
+    "name": "10-results",
+    "title": "บันทึกและประกาศผลสอบ",
+    "subtitle": "บันทึกผลคัดเลือกก่อนเปิดประกาศ • ชุดข้อมูลนี้ยังไม่ได้บันทึกผลสอบ",
+    "image": "screenshots/10-results.png",
+    "url": "/operations/outcomes?round=5"
+  },
+  {
+    "name": "11-reports",
+    "title": "รายงานสรุป",
+    "subtitle": "จำนวนใบสมัคร ผลตรวจรับเงิน และรายรับ แยกตามรอบและโครงการ • ยอดในภาพเป็นข้อมูลทดสอบ",
+    "image": "screenshots/11-reports.png",
+    "url": "/operations/reports?round=5"
+  },
+  {
+    "name": "12-mobile",
+    "title": "ใช้งานบนโทรศัพท์",
+    "subtitle": "หน้ารับสมัครปรับเป็นคอลัมน์เดียว รองรับผู้สมัครจากมือถือ",
+    "image": "screenshots/12-mobile.png",
+    "url": "/site/index"
+  }
+]

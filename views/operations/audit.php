@@ -1,0 +1,8 @@
+<?php
+use app\helpers\Ui;
+use yii\helpers\Html;
+$this->title = 'ประวัติการใช้งานสำคัญ';
+?>
+<div class="page-heading"><div><p class="eyebrow">8 · ประวัติการใช้งาน</p><h1><?= $this->title ?></h1></div></div>
+<?= Html::beginForm(['audit'], 'get', ['class' => 'round-picker']) ?><label class="field">ประเภทเหตุการณ์<?= Html::dropDownList('event', $event, array_combine($events, array_map(fn($key) => \app\services\AuditService::LABELS[$key] ?? $key, $events)), ['prompt' => 'ทุกเหตุการณ์', 'class' => 'input']) ?></label><button type="submit" class="button-secondary">แสดงประวัติ</button><?= Html::endForm() ?>
+<div class="table-scroll"><table class="data-table"><thead><tr><th>วันเวลา / ผู้ทำรายการ</th><th>เหตุการณ์</th><th>รายการอ้างอิง</th><th>รายละเอียด</th></tr></thead><tbody><?php foreach ($provider->getModels() as $row): $details = is_string($row['details']) ? json_decode($row['details'], true) : $row['details']; ?><tr><td><?= Ui::date($row['created_at']) ?><small class="cell-secondary"><?= Html::encode($row['actor_name']) ?></small></td><td><?= Html::encode(\app\services\AuditService::LABELS[$row['action']] ?? $row['action']) ?><small class="cell-secondary"><?= Html::encode($row['action']) ?></small></td><td><?= Html::encode($row['entity'] . ' #' . $row['entity_id']) ?></td><td><details><summary>รายละเอียดรายการ</summary><pre class="audit-details"><?= Html::encode(json_encode($details, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) ?></pre></details></td></tr><?php endforeach ?><?php if (!$provider->totalCount): ?><tr><td colspan="4" class="empty-state">ยังไม่มีประวัติรายการ</td></tr><?php endif ?></tbody></table></div><div class="pagination"><?= \yii\widgets\LinkPager::widget(['pagination' => $provider->pagination]) ?></div>

@@ -1,0 +1,126 @@
+<?php
+require dirname(__DIR__) . '/config/bootstrap.php';
+new yii\console\Application(require dirname(__DIR__) . '/config/console.php');
+
+use app\models\{User, ExamType, ExamRound, Subject, Application, ApplicantIdentityForm, AdmissionForm, AdmissionProgram, Milestone, RoundScheduleForm};
+use app\services\ApplicantAccountService;
+use app\services\RegistrationService;
+
+if (YII_ENV !== 'dev') throw new RuntimeException('Tests require APP_ENV=dev');
+$tx = Yii::$app->db->beginTransaction();
+$checks = 0;
+function check(bool $condition, string $message): void {
+    global $checks;
+    if (!$condition) throw new RuntimeException($message);
+    $checks++;
+}
+function rejected(callable $call, string $expected): void {
+    try { $call(); } catch (DomainException $e) {
+        check(str_contains($e->getMessage(), $expected), 'Unexpected rejection: ' . $e->getMessage()); return;
+    }
+    throw new RuntimeException('Expected rejection: ' . $expected);
+}
+try {
+    $base = '999' . str_pad((string) random_int(0, 999999999), 9, '0', STR_PAD_LEFT);
+    $sum = 0;
+    for ($i = 0; $i < 12; $i++) $sum += (int) $base[$i] * (13 - $i);
+    $identity = new ApplicantIdentityForm(['scenario' => 'register', 'name' => 'Identity Test', 'national_id' => $base . ((11 - $sum % 11) % 10), 'birth_date' => '29022543']);
+    check($identity->validate(), 'Valid ID and Buddhist leap-day date accepted');
+    $accounts = new ApplicantAccountService();
+    $account = $accounts->registerOrAuthenticate($identity);
+    check($account->email === null, 'Email must be optional');
+    check($account->birth_date_hash !== $identity->birth_date && Yii::$app->security->validatePassword($identity->birth_date, $account->birth_date_hash), 'Birth date must be hashed');
+    check($accounts->authenticate($identity)->id === $account->id, 'Existing account login');
+    $identity->birth_date = '28022543';
+    rejected(fn() => $accounts->registerOrAuthenticate($identity), 'ไม่ถูกต้อง');
+    $identity->birth_date = '29022542';
+    check(!$identity->validate(), 'Invalid leap day rejected');
+    $identity->birth_date = '01012000';
+    check(!$identity->validate(), 'Gregorian year rejected');
+    $identity->birth_date = '01012540';
+    $identity->national_id = substr($identity->national_id, 0, 12) . (((int) substr($identity->national_id, -1) + 1) % 10);
+    check(!$identity->validate(), 'Invalid ID checksum rejected');
+    $user = new User(['name' => 'Test', 'email' => 'domain-' . bin2hex(random_bytes(4)) . '@example.test', 'auth_key' => 'test', 'password_hash' => 'not-used', 'created_at' => date('Y-m-d H:i:s'), 'role' => 'applicant']);
+    $user->save(false);
+    $type = new ExamType(['name' => 'Test ' . bin2hex(random_bytes(4))]); $type->save(false);
+    $round = new ExamRound(['name' => 'Domain Test', 'exam_type_id' => $type->id, 'opens_at' => date('Y-m-d H:i:s', time() - 3600), 'closes_at' => date('Y-m-d H:i:s', time() + 3600), 'payment_due_at' => date('Y-m-d H:i:s', time() + 7200), 'status' => 'published']); $round->save(false);
+    $subject = new Subject(['round_id' => $round->id, 'code' => 'ONE', 'name' => 'Test A', 'starts_at' => '2027-01-10 09:00:00', 'ends_at' => '2027-01-10 10:00:00', 'capacity' => 1, 'fee' => '100.10', 'status' => 'open']);
+    check($subject->save(), 'Valid subject should save');
+    $overlap = new Subject($subject->attributes); $overlap->id = null; $overlap->code = 'TWO'; $overlap->starts_at = '2027-01-10 09:30:00'; $overlap->fee = '200.20'; $overlap->save(false);
+    $service = new RegistrationService();
+    rejected(fn() => $service->register($user->id, $round->id, []), 'อย่างน้อย');
+    rejected(fn() => $service->register($user->id, $round->id, [$subject->id, $overlap->id]), 'ซ้อนกัน');
+    check(!Application::find()->where(['round_id' => $round->id])->exists(), 'Failed registration must not create application');
+    rejected(fn() => $service->register($user->id, $round->id, [999999999]), 'ไม่ถูกต้อง');
+    $overlap->starts_at = '2027-01-10 10:00:00'; $overlap->ends_at = '2027-01-10 11:00:00'; $overlap->save(false);
+    $application = $service->register($user->id, $round->id, [$subject->id, $overlap->id, $overlap->id]);
+    check($application->total === '300.30', 'Exact server-side total');
+    check(count($application->items) === 2, 'Duplicate subject IDs must be deduplicated');
+    rejected(fn() => $service->register($user->id, $round->id, [$subject->id]), 'สมัครรอบสอบนี้แล้ว');
+    $subject->fee = '999.00'; $subject->save(false);
+    check((string) $application->items[0]->fee === '100.10', 'Application fee snapshot should not change');
+    $user2 = new User($user->attributes); $user2->id = null; $user2->email = 'second-' . bin2hex(random_bytes(4)) . '@example.test'; $user2->save(false);
+    rejected(fn() => $service->register($user2->id, $round->id, [$subject->id]), 'เต็มแล้ว');
+    $subject->capacity = 0;
+    check(!$subject->validate(), 'Capacity cannot be below registrations or zero');
+    $subject->capacity = 2; $subject->ends_at = $subject->starts_at;
+    check(!$subject->validate(), 'Exam end must be after start');
+    $round->status = 'closed'; $round->save(false);
+    rejected(fn() => $service->register($user2->id, $round->id, [$overlap->id]), 'ปิดรับสมัครแล้ว');
+    $round->closes_at = $round->opens_at;
+    check(!$round->validate(), 'Closing time must follow opening time');
+    $program = new AdmissionProgram(['target_grade' => 'm4', 'minimum_gpa' => '2.50', 'minimum_foreign_gpa' => '2.75']);
+    $form = new AdmissionForm(['education_level' => 'm3', 'gpa' => '2.50', 'foreign_gpa' => '2.75']);
+    check($form->checkProgram($program), 'Exact threshold must pass');
+    $form->foreign_gpa = '2.74'; check(!$form->checkProgram($program), 'Foreign-language threshold enforced');
+    $form->foreign_gpa = ''; check(!$form->checkProgram($program), 'Required foreign-language GPA cannot be empty');
+    $form->foreign_gpa = '3.00'; $form->gpa = '2.49'; check(!$form->checkProgram($program), 'Overall GPA threshold enforced');
+    $form->gpa = '3.00'; $form->education_level = 'p6'; check(!$form->checkProgram($program), 'M4 requires M3 education');
+    $program->target_grade = 'm1'; $program->minimum_gpa = '3.00'; $program->minimum_foreign_gpa = null;
+    $form->foreign_gpa = ''; check($form->checkProgram($program), 'M1 SMTP allows empty foreign-language GPA');
+    $form->gpa = '4.01'; check(!$form->validate(['gpa']), 'GPA cannot exceed 4');
+    $form->gpa = '3.001'; check(!$form->validate(['gpa']), 'GPA limited to two decimals');
+    check(!$form->validate(['photo']), 'Student photo required for admission');
+    check($form->validate(['id_copy', 'house_copy', 'transcript', 'name_change']), 'Enrollment documents are not required at application');
+    $addressForm = new AdmissionForm(['subdistrict_code' => '800801', 'district' => 'forged', 'province' => 'forged', 'postal_code' => '00000']);
+    check($addressForm->validate(['subdistrict_code', 'district', 'province', 'postal_code']), 'Address code resolves on the server');
+    check($addressForm->subdistrict === 'ท่าศาลา' && $addressForm->district === 'ท่าศาลา' && $addressForm->province === 'นครศรีธรรมราช' && $addressForm->postal_code === '80160', 'Canonical address replaces client-submitted address parts');
+    $addressForm->subdistrict_code = '999999'; check(!$addressForm->validate(['subdistrict_code']), 'Unknown area code rejected');
+    $addressForm->subdistrict_code = ''; check(!$addressForm->validate(['subdistrict_code']), 'An actual area selection is required');
+    $bangkok = \app\services\ThaiAddressCatalog::find('100402');
+    check($bangkok && str_contains(\app\services\ThaiAddressCatalog::label($bangkok), 'แขวง') && str_contains(\app\services\ThaiAddressCatalog::label($bangkok), 'เขต'), 'Bangkok uses district and subdistrict labels correctly');
+    $paymentForm = new \app\models\PaymentForm();
+    check(!$paymentForm->validate(), 'Payment proof is mandatory with an application');
+    $paymentForm->amount = '100';
+    check(!$paymentForm->validate(), 'Payment requires slip and transfer date together');
+    $paymentForm->transferred_at = '2999-01-01 00:00:00';
+    check(!$paymentForm->validate(['transferred_at']), 'Future payment date rejected');
+    $accountRound = new ExamRound(['payment_bank' => 'Bank']);
+    check(!$accountRound->validate(['payment_bank', 'payment_account', 'payment_account_name']), 'Bank account details must be complete');
+    $form->confirmed = '0'; check(!$form->validate(['confirmed']), 'Certification required');
+    $round->refresh();
+    $scheduleRound = new ExamRound($round->attributes); $scheduleRound->id = null; $scheduleRound->name = 'Schedule test'; $scheduleRound->is_example = false; $scheduleRound->save(false);
+    $editor = RoundScheduleForm::forRound($scheduleRound);
+    $editor->loadRows([['title' => 'รายงานตัว', 'occurs_at' => '2027-02-01T08:30', 'ends_at' => '2027-02-01T12:00', 'venue' => 'อาคาร A', 'note' => 'นำบัตรประชาชนมาแสดง']], $editor->revision);
+    check($editor->validateForRound($scheduleRound), 'Schedule date range valid');
+    $editor->saveForRound($scheduleRound->id);
+    $milestone = $scheduleRound->getMilestones()->one();
+    check($milestone->venue === 'อาคาร A' && $milestone->ends_at === '2027-02-01 12:00:00', 'Schedule details persisted');
+    $revision = RoundScheduleForm::currentRevision($scheduleRound->id);
+    $invalid = new RoundScheduleForm();
+    $invalid->loadRows([['id' => $milestone->id, 'title' => 'ผิด', 'occurs_at' => '2027-02-02T08:30', 'ends_at' => '2027-02-01T12:00']], $revision);
+    check(!$invalid->validateForRound($scheduleRound), 'Schedule end cannot precede start');
+    check($scheduleRound->getMilestones()->one()->title === 'รายงานตัว', 'Invalid data leaves stored schedule unchanged');
+    $foreignEditor = new RoundScheduleForm();
+    $foreignEditor->loadRows([['id' => $milestone->id, 'title' => 'ต่างรอบ', 'occurs_at' => '2027-02-01T08:30']], RoundScheduleForm::currentRevision($round->id));
+    check(!$foreignEditor->validateForRound($round), 'Cross-round IDs rejected');
+    $stale = new RoundScheduleForm(); $stale->loadRows([], $revision);
+    $milestone->title = 'แก้ไขจากอีกหน้าต่าง'; $milestone->save(false);
+    check(!$stale->validateForRound($scheduleRound), 'Stale schedule revision rejected');
+    $clear = new RoundScheduleForm(); $clear->loadRows([], RoundScheduleForm::currentRevision($scheduleRound->id));
+    check($clear->validateForRound($scheduleRound), 'Empty schedule can be saved'); $clear->saveForRound($scheduleRound->id);
+    check(!$scheduleRound->getMilestones()->exists(), 'Clearing schedule deletes all rows for only this round');
+    $oversize = new RoundScheduleForm(); $oversize->loadRows(array_fill(0, 51, []), RoundScheduleForm::currentRevision($scheduleRound->id));
+    check(!$oversize->validateForRound($scheduleRound), 'Schedule size limited');
+    echo "$checks domain checks passed. Test data rolled back.\n";
+} finally { $tx->rollBack(); }
